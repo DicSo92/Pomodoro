@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {View, StyleSheet, TextInput } from 'react-native';
+import {View, StyleSheet, TextInput, Text } from 'react-native';
 
 import List from './List'
 import AddTask from './AddTask'
@@ -32,15 +32,20 @@ const Home = () => {
 
     return (
         <View style={styles.container}>
-            <AddTask addTask={_addTask}/>
-            <List datas={tasks} />
+            <Text style={styles.timer}>19.58</Text>
+            <AddTask addTask={_addTask} style={styles.flex1}/>
+            <List datas={tasks} style={styles.flex3}/>
         </View>)
 }
 
 
 const styles = StyleSheet.create({
     container: {
-        flexDirection: 'row'
+        flexDirection: 'column'
     },
+    timer: {
+        textAlign: 'center',
+        fontSize: 40,
+    }
 })
 export default Home

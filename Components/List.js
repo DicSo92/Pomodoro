@@ -12,12 +12,10 @@ const List = ({datas}) => {
         <FlatList
             data={datas}
             renderItem={renderItem}
-            keyExtractor={item => item.id}
+            keyExtractor={item => item.id.toString()}
         />
     )
 }
-
-const pixelLength = 20
 
 const styles = StyleSheet.create({
     //
