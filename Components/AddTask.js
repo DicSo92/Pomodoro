@@ -9,7 +9,8 @@ const AddTask = ({addTask}) => {
 
     const submitTask = () => {
         addTask(title)
-        textInput.current.clear()
+        setTitle('')
+        // textInput.current.clear()
     }
 
     return (
