@@ -29,7 +29,6 @@ const AddTask = ({addTask}) => {
 const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
-        // alignItems: 'center',
         margin: 10
     },
     input: {
@@ -50,6 +49,7 @@ const styles = StyleSheet.create({
         padding: 10
     },
     buttonText: {
+        fontSize: 18,
         color: 'white'
     }
 })
