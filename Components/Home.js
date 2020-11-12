@@ -35,11 +35,27 @@ const Home = () => {
     const _addTask = (title) => {
         setTasks([...tasks, { id: new Date().getTime(), title, isDone: false}])
     }
+    const _updateTask = (id, title) => {
+        let array = [...tasks]
+        let index = array.findIndex(item => item.id === id)
+        if (index !== -1) {
+            array[index].title = title
+            setTasks(array);
+        }
+    }
     const _removeTask = (id) => {
-        let array = [...tasks]; // make a separate copy of the array
+        let array = [...tasks]
         let index = array.findIndex(item => item.id === id)
         if (index !== -1) {
             array.splice(index, 1);
+            setTasks(array);
+        }
+    }
+    const _toggleDone = (id) => {
+        let array = [...tasks]
+        let index = array.findIndex(item => item.id === id)
+        if (index !== -1) {
+            array[index].isDone = !array[index].isDone
             setTasks(array);
         }
     }
@@ -73,7 +89,12 @@ const Home = () => {
 
             {isVisible ? <AddTask addTask={_addTask} style={styles.flex1}/> : null}
 
-            <List style={styles.flex3} datas={tasks} removeTask={_removeTask}/>
+            <List style={styles.flex3}
+                  datas={tasks}
+                  removeTask={_removeTask}
+                  updateTask={_updateTask}
+                  toggleDone={_toggleDone}
+            />
         </View>)
 }
 
