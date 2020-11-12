@@ -84,6 +84,12 @@ const Home = () => {
     const toggleInput = () => {
         setIsVisible(!isVisible)
     }
+    const _toggleSelectedTask = (item = null) => {
+        if (item)
+            setSelectedTask(item)
+        else
+            setSelectedTask(null)
+    }
 
     return (
         <View style={styles.container}>
@@ -132,6 +138,7 @@ const Home = () => {
                   removeTask={_removeTask}
                   updateTask={_updateTask}
                   toggleDone={_toggleDone}
+                  toggleSelectedTask={_toggleSelectedTask}
             />
         </View>)
 }

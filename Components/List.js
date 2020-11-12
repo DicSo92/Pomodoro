@@ -3,12 +3,13 @@ import {StyleSheet, FlatList} from 'react-native';
 
 import ListItem from './ListItem'
 
-const List = ({datas, removeTask, toggleDone, updateTask}) => {
+const List = ({datas, removeTask, toggleDone, updateTask, toggleSelectedTask}) => {
     const renderItem = ({item}) => (
         <ListItem item={item}
                   removeTask={() => removeTask(item.id)}
                   updateTask={(title) => updateTask(item.id, title)}
                   toggleDone={() => toggleDone(item.id)}
+                  toggleSelectedTask={() => toggleSelectedTask(item)}
         />
     )
 
