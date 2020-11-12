@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, FlatList, Text, View} from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 
 const arraySessions = [1,0,1,0,1,0,1,2]
 

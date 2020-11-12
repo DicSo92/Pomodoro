@@ -3,41 +3,12 @@ import {View, StyleSheet, Text, Dimensions, TouchableOpacity } from 'react-nativ
 import Svg,{ Circle } from 'react-native-svg';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import CountDown from 'react-native-countdown-component';
 
 import List from './List'
 import AddTask from './AddTask'
 import Sessions from "./Sessions";
-
-const fakeTasks = [
-    {
-        id: 1,
-        title: 'exemple1',
-        isDone: false,
-        sessionsDone: {
-            session: null,
-            time: null
-        }
-    },
-    {
-        id: 2,
-        title: 'exemple2',
-        isDone: true,
-        sessionsDone: {
-            session: null,
-            time: null
-        }
-    },
-    {
-        id: 3,
-        title: 'exemple3',
-        isDone: false,
-        sessionsDone: {
-            session: null,
-            time: null
-        }
-    }
-]
+import Timer from "./Timer";
+import SelectATask from "./SelectATask";
 
 const headerHeight = 175
 const screen = Dimensions.get('window');
@@ -49,7 +20,6 @@ const lastSession = 15
 const Home = () => {
     const STORAGE_KEY = 'pomodoro_tasks'
 
-    // const [tasks, setTasks] = useState(fakeTasks)
     const [tasks, setTasks] = useState([])
     const [isVisible, setIsVisible] = useState(false);
     const [time, setTime] = useState(sessionsDuration * 60)
@@ -77,7 +47,15 @@ const Home = () => {
     }
 
     const _addTask = (title) => {
-        setTasks([...tasks, { id: new Date().getTime(), title, isDone: false}])
+        setTasks([...tasks, {
+            id: new Date().getTime(),
+            title,
+            isDone: false,
+            sessionsDone: {
+                session: null,
+                time: null
+            }
+        }])
     }
     const _updateTask = (id, title) => {
         let array = [...tasks]
@@ -125,7 +103,7 @@ const Home = () => {
                         <Text style={styles.task}>Task :</Text>
                         <Text style={styles.taskName}>{selectedTask.title}</Text>
                     </View>
-                    : null
+                : null
                 }
 
 
@@ -134,21 +112,12 @@ const Home = () => {
                           lastSession={lastSession}
                 />
 
-                <View style={styles.timerText}>
-                    <CountDown
-                        size={40}
-                        until={65}
-                        running={false}
-                        onFinish={() => alert('Finished')}
-                        digitStyle={{backgroundColor: 'transparent', borderWidth: 0, width: null, height: null}}
-                        digitTxtStyle={{color: '#f2f2f2', fontWeight: 'bold'}}
-                        separatorStyle={{color: '#f2f2f2', top: -2}}
-                        timeToShow={['M', 'S']}
-                        timeLabels={{m: null, s: null}}
-                        showSeparator
-                    />
-                    <Text style={styles.minutes}>minutes</Text>
-                </View>
+                {selectedTask ?
+                    <Timer headerHeight={headerHeight}/>
+                :
+                    <SelectATask headerHeight={headerHeight}/>
+                }
+
                 <TouchableOpacity
                     onPress={toggleInput}
                     style={styles.roundButton}>
@@ -156,7 +125,7 @@ const Home = () => {
                 </TouchableOpacity>
             </View>
 
-            {isVisible ? <AddTask addTask={_addTask} style={styles.flex1}/> : null}
+            {isVisible ? <AddTask addTask={_addTask} /> : null}
 
             <List style={styles.flex3}
                   datas={tasks}
@@ -191,18 +160,6 @@ const styles = StyleSheet.create({
     taskName: {
         color: '#f2f2f2',
 
-    },
-    timerText: {
-        position: 'absolute',
-        alignSelf: 'center',
-        top: headerHeight * 0.23
-    },
-    minutes: {
-        textAlign: 'center',
-        fontSize: 12,
-        fontWeight: 'bold',
-        color: '#f2f2f2',
-        top: -8
     },
     roundButton: {
         width: 80,
