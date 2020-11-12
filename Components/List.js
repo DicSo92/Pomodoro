@@ -3,9 +3,9 @@ import {StyleSheet, FlatList} from 'react-native';
 
 import ListItem from './ListItem'
 
-const List = ({datas}) => {
+const List = ({datas, removeTask}) => {
     const renderItem = ({item}) => (
-        <ListItem item={item} />
+        <ListItem item={item} removeTask={() => removeTask(item.id)}/>
     )
 
     return (

@@ -1,9 +1,9 @@
 import React, {createRef, useState} from 'react';
-import {StyleSheet, Text, TextInput, View} from 'react-native';
+import {StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-const ListItem = ({item}) => {
+const ListItem = ({item, removeTask}) => {
     const textInputItem = createRef();
 
     const [title, setTitle] = useState(item.title)
@@ -25,7 +25,10 @@ const ListItem = ({item}) => {
 
             <Icon name="check" size={25} color={item.isDone ? '#358600' : '#D6D6D6'} style={{marginRight: 10}}/>
             <Icon name="play" size={25} color="#f4511e" style={{marginRight: 10}}/>
-            <Icon name="trash" size={25} color="#A41324" />
+            {/*<TouchableOpacity>*/}
+            <TouchableOpacity onPress={removeTask}>
+                <Icon name="trash" size={25} color="#A41324"/>
+            </TouchableOpacity>
         </View>
     )
 }
