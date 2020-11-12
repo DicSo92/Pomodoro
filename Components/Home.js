@@ -1,36 +1,80 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {View, StyleSheet, Text, Dimensions, TouchableOpacity } from 'react-native';
 import Svg,{ Circle } from 'react-native-svg';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import CountDown from 'react-native-countdown-component';
 
 import List from './List'
 import AddTask from './AddTask'
+import Sessions from "./Sessions";
 
 const fakeTasks = [
     {
         id: 1,
         title: 'exemple1',
-        isDone: false
+        isDone: false,
+        sessionsDone: {
+            session: null,
+            time: null
+        }
     },
     {
         id: 2,
         title: 'exemple2',
-        isDone: true
+        isDone: true,
+        sessionsDone: {
+            session: null,
+            time: null
+        }
     },
     {
         id: 3,
         title: 'exemple3',
-        isDone: false
+        isDone: false,
+        sessionsDone: {
+            session: null,
+            time: null
+        }
     }
 ]
 
 const headerHeight = 175
 const screen = Dimensions.get('window');
 
+const sessionsDuration = 25
+const pausesDuration = 5
+const lastSession = 15
 
 const Home = () => {
-    const [tasks, setTasks] = useState(fakeTasks)
+    const STORAGE_KEY = 'pomodoro_tasks'
+
+    // const [tasks, setTasks] = useState(fakeTasks)
+    const [tasks, setTasks] = useState([])
     const [isVisible, setIsVisible] = useState(false);
+    const [time, setTime] = useState(sessionsDuration * 60)
+    const [selectedTask, setSelectedTask] = useState(null)
+
+    useEffect(() => {_readStorageData()}, [])
+    useEffect(() => {_saveStorageData()}, [tasks])
+
+    const _readStorageData = async () => {
+        try {
+            const tasks = await AsyncStorage.getItem(STORAGE_KEY)
+            if (tasks !== null) {
+                setTasks(JSON.parse(tasks))
+            }
+        } catch (e) {
+            console.error('Failed to fetch the data from storage')
+        }
+    }
+    const _saveStorageData = async () => {
+        try {
+            await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(tasks))
+        } catch (e) {
+            console.error('Failed to save the data to the storage')
+        }
+    }
 
     const _addTask = (title) => {
         setTasks([...tasks, { id: new Date().getTime(), title, isDone: false}])
@@ -40,7 +84,7 @@ const Home = () => {
         let index = array.findIndex(item => item.id === id)
         if (index !== -1) {
             array[index].title = title
-            setTasks(array);
+            setTasks(array)
         }
     }
     const _removeTask = (id) => {
@@ -75,15 +119,40 @@ const Home = () => {
                         strokeWidth="2"
                     />
                 </Svg>
-                <View style={styles.absoluteInfos}>
-                    <Text style={styles.task}>Task :</Text>
-                    <Text style={styles.taskName}>Exemple1</Text>
+
+                {selectedTask ?
+                    <View style={styles.absoluteInfos}>
+                        <Text style={styles.task}>Task :</Text>
+                        <Text style={styles.taskName}>{selectedTask.title}</Text>
+                    </View>
+                    : null
+                }
+
+
+                <Sessions sessionsDuration={sessionsDuration}
+                          pausesDuration={pausesDuration}
+                          lastSession={lastSession}
+                />
+
+                <View style={styles.timerText}>
+                    <CountDown
+                        size={40}
+                        until={65}
+                        running={false}
+                        onFinish={() => alert('Finished')}
+                        digitStyle={{backgroundColor: 'transparent', borderWidth: 0, width: null, height: null}}
+                        digitTxtStyle={{color: '#f2f2f2', fontWeight: 'bold'}}
+                        separatorStyle={{color: '#f2f2f2', top: -2}}
+                        timeToShow={['M', 'S']}
+                        timeLabels={{m: null, s: null}}
+                        showSeparator
+                    />
+                    <Text style={styles.minutes}>minutes</Text>
                 </View>
-                <Text style={styles.timer}>19.44</Text>
                 <TouchableOpacity
                     onPress={toggleInput}
                     style={styles.roundButton}>
-                    <Icon name="plus" size={35} color="#eee" />
+                    <Icon name={isVisible ? 'times' : 'plus'} size={35} color="#eee" />
                 </TouchableOpacity>
             </View>
 
@@ -123,15 +192,17 @@ const styles = StyleSheet.create({
         color: '#f2f2f2',
 
     },
-    timer: {
-        textAlign: 'center',
-        fontSize: 40,
-        fontWeight: 'bold',
-        color: '#f2f2f2',
-
+    timerText: {
         position: 'absolute',
         alignSelf: 'center',
-        top: headerHeight * 0.3
+        top: headerHeight * 0.23
+    },
+    minutes: {
+        textAlign: 'center',
+        fontSize: 12,
+        fontWeight: 'bold',
+        color: '#f2f2f2',
+        top: -8
     },
     roundButton: {
         width: 80,
