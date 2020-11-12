@@ -16,6 +16,7 @@ const screen = Dimensions.get('window');
 const sessionsDuration = 25
 const pausesDuration = 5
 const lastSession = 15
+const arraySessions = [1,0,1,0,1,0,1,2]
 
 const Home = () => {
     const STORAGE_KEY = 'pomodoro_tasks'
@@ -23,7 +24,9 @@ const Home = () => {
     const [tasks, setTasks] = useState([])
     const [isVisible, setIsVisible] = useState(false);
     const [time, setTime] = useState(sessionsDuration * 60)
+    const [currentCount, setCurrentCount] = useState(sessionsDuration * 60)
     const [selectedTask, setSelectedTask] = useState(null)
+    const [running, setRunning] = useState(false)
 
     useEffect(() => {_readStorageData()}, [])
     useEffect(() => {_saveStorageData()}, [tasks])
@@ -51,9 +54,9 @@ const Home = () => {
             id: new Date().getTime(),
             title,
             isDone: false,
-            sessionsDone: {
-                session: null,
-                time: null
+            session: {
+                sessionStep: 0,
+                time: sessionsDuration * 60
             }
         }])
     }
@@ -81,14 +84,54 @@ const Home = () => {
             setTasks(array);
         }
     }
-    const toggleInput = () => {
+    const _endSession = () => {
+        const select = selectedTask
+        select.session.sessionStep += 1
+
+        let sessionType = arraySessions[selectedTask.session.sessionStep]
+        if (sessionType === 1) setTime(sessionsDuration * 60)
+        else if (sessionType === 0) setTime(pausesDuration * 60)
+        else setTime(lastSession * 60)
+
+        select.session.time = time
+        setSelectedTask(select)
+        // updateTaskSession()
+    }
+    const _toggleSelectedTask = (item) => {
+        // if (selectedTask) updateTaskSession()
+        if (item) {
+            setSelectedTask(item)
+            if (selectedTask) {
+                // setCurrentCount(selectedTask.session.time)
+                setTime(selectedTask.session.time)
+                setRunning(false)
+            }
+        } else
+            setSelectedTask(null)
+    }
+    const _onTimerChange = (count) => {
+        setCurrentCount(count)
+    }
+    const updateTaskSession = () => {
+        let array = [...tasks]
+        let index = array.findIndex(item => item.id === selectedTask.id)
+        console.log(index)
+        if (index !== -1) {
+            array[index].session.sessionStep = selectedTask.session.sessionStep
+            array[index].session.time = currentCount
+            setTasks(array)
+        }
+    }
+
+    const _toggleInput = () => {
         setIsVisible(!isVisible)
     }
-    const _toggleSelectedTask = (item = null) => {
-        if (item)
-            setSelectedTask(item)
-        else
-            setSelectedTask(null)
+    const _startCountDown = () => {
+        setRunning(true)
+    }
+    const _stopCountDown = () => {
+        setRunning(false)
+        updateTaskSession()
     }
 
     return (
@@ -113,28 +156,43 @@ const Home = () => {
                 }
 
 
-                <Sessions sessionsDuration={sessionsDuration}
+                <Sessions arraySessions={arraySessions}
+                          sessionsDuration={sessionsDuration}
                           pausesDuration={pausesDuration}
                           lastSession={lastSession}
+                          selectedTask={selectedTask}
                 />
 
                 {selectedTask ?
-                    <Timer headerHeight={headerHeight}/>
+                    <Timer key={selectedTask.id + selectedTask.session.sessionStep}
+                           headerHeight={headerHeight}
+                           running={running}
+                           time={time}
+                           endSession={_endSession}
+                           onTimerChange={_onTimerChange}/>
                 :
                     <SelectATask headerHeight={headerHeight}/>
                 }
 
-                <TouchableOpacity
-                    onPress={toggleInput}
-                    style={styles.roundButton}>
-                    <Icon name={isVisible ? 'times' : 'plus'} size={35} color="#eee" />
-                </TouchableOpacity>
+                {selectedTask ?
+                    <TouchableOpacity
+                        onPress={!running ? _startCountDown : _stopCountDown}
+                        style={styles.roundButton}>
+                        <Icon name={!running ? 'play' : 'pause'} size={35} color="#eee" style={!running ? {right: -3} : null}/>
+                    </TouchableOpacity>
+                :
+                    <TouchableOpacity
+                        onPress={_toggleInput}
+                        style={styles.roundButton}>
+                        <Icon name={isVisible ? 'times' : 'plus'} size={35} color="#eee" />
+                    </TouchableOpacity>
+                }
+
             </View>
 
             {isVisible ? <AddTask addTask={_addTask} /> : null}
 
-            <List style={styles.flex3}
-                  datas={tasks}
+            <List datas={tasks}
                   removeTask={_removeTask}
                   updateTask={_updateTask}
                   toggleDone={_toggleDone}

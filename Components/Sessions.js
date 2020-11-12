@@ -1,9 +1,7 @@
 import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 
-const arraySessions = [1,0,1,0,1,0,1,2]
-
-const Sessions = ({sessionsDuration, pausesDuration, lastSession}) => {
+const Sessions = ({arraySessions, sessionsDuration, pausesDuration, lastSession, selectedTask}) => {
     let sessionList = arraySessions.map(function(session, index) {
         let duration = null
         if (session === 1) duration = sessionsDuration
@@ -11,8 +9,19 @@ const Sessions = ({sessionsDuration, pausesDuration, lastSession}) => {
         else duration = lastSession
 
         return (
-            <View style={[session === 1 ? styles.workSession : styles.pauseSession, styles.bubble]} key={index}>
-                <Text style={{color: "#f2f2f2"}}>{duration}</Text>
+            <View style={[
+                    session === 1 ? styles.workSession : styles.pauseSession,
+                    styles.bubble,
+                    selectedTask && selectedTask.session.sessionStep === index ? {borderColor: '#FFBE0B'} : null
+                ]}
+                  key={index}
+            >
+                <Text style={[
+                    {color: "#f2f2f2"},
+                    selectedTask && selectedTask.session.sessionStep === index ? {color: '#FFBE0B'} : null
+                ]}>
+                    {duration}
+                </Text>
             </View>
         )
     })
