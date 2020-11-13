@@ -12,13 +12,15 @@ const Sessions = ({arraySessions, sessionsDuration, pausesDuration, lastSession,
             <View style={[
                     session === 1 ? styles.workSession : styles.pauseSession,
                     styles.bubble,
-                    selectedTask && selectedTask.session.sessionStep === index ? {borderColor: '#FFBE0B'} : null
+                    selectedTask && selectedTask.session.sessionStep === index ? {borderColor: '#FFBE0B'} : null,
+                    selectedTask && (selectedTask.session.sessionStep > index || selectedTask.session.sessionStep === null) ? {borderColor: '#121212'} : null
                 ]}
                   key={index}
             >
                 <Text style={[
                     {color: "#f2f2f2"},
-                    selectedTask && selectedTask.session.sessionStep === index ? {color: '#FFBE0B'} : null
+                    selectedTask && selectedTask.session.sessionStep === index ? {color: '#FFBE0B'} : null,
+                    selectedTask && (selectedTask.session.sessionStep > index || selectedTask.isDone) ? {color: '#121212'} : null
                 ]}>
                     {duration}
                 </Text>

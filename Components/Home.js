@@ -9,6 +9,7 @@ import AddTask from './AddTask'
 import Sessions from "./Sessions";
 import Timer from "./Timer";
 import SelectATask from "./SelectATask";
+import FinishedTask from "./FinishedTask";
 
 const headerHeight = 175
 const screen = Dimensions.get('window');
@@ -89,17 +90,26 @@ const Home = () => {
     const _endSession = () => {
         setTimeout(() => {
             setShowCountDown(false) // ----------
-            const select = selectedTask
-            select.session.sessionStep += 1
+            let select = selectedTask
 
-            let sessionType = arraySessions[selectedTask.session.sessionStep]
-            if (sessionType === 1) select.session.time = sessionsDuration * 60
-            else if (sessionType === 0) select.session.time = pausesDuration * 60
-            else select.session.time = lastSession * 60
+            if (selectedTask.session.sessionStep === arraySessions.length - 1) {
+                select.isDone = true
+                select.session.sessionStep = null
+                select.session.time = 0
+                setRunning(false)
+            } else {
+                select.session.sessionStep += 1
+                let sessionType = arraySessions[selectedTask.session.sessionStep]
+                if (sessionType === 1) select.session.time = sessionsDuration * 60
+                else if (sessionType === 0) select.session.time = pausesDuration * 60
+                else select.session.time = lastSession * 60
 
-            setTime(select.session.time)
+                setTime(select.session.time)
+            }
+
             setSelectedTask(select)
             updateTaskSession()
+
             setShowCountDown(true)// ----------
         }, 100)
     }
@@ -138,6 +148,9 @@ const Home = () => {
         setRunning(false)
         updateTaskSession()
     }
+    const _stopTask = () => {
+        setSelectedTask( null)
+    }
 
     return (
         <View style={styles.container}>
@@ -168,7 +181,7 @@ const Home = () => {
                           selectedTask={selectedTask}
                 />
 
-                {selectedTask ?
+                {(selectedTask && !selectedTask.isDone) &&
                     <Timer key={selectedTask.id + selectedTask.session.sessionStep}
                            headerHeight={headerHeight}
                            running={running}
@@ -177,17 +190,30 @@ const Home = () => {
                            onTimerChange={_onTimerChange}
                            showCountDown={showCountDown}
                     />
-                :
+                }
+                {(selectedTask && selectedTask.isDone) &&
+                    <FinishedTask headerHeight={headerHeight}/>
+                }
+                {!selectedTask &&
                     <SelectATask headerHeight={headerHeight}/>
                 }
 
-                {selectedTask ?
+                {(selectedTask && !selectedTask.isDone) &&
                     <TouchableOpacity
                         onPress={!running ? _startCountDown : _stopCountDown}
                         style={styles.roundButton}>
-                        <Icon name={!running ? 'play' : 'pause'} size={35} color="#eee" style={!running ? {right: -3} : null}/>
+                        <Icon name={!running ? 'play' : 'pause'} size={35} color="#eee"
+                              style={!running ? {right: -3} : null}/>
                     </TouchableOpacity>
-                :
+                }
+                {(selectedTask && selectedTask.isDone) &&
+                    <TouchableOpacity
+                        onPress={_stopTask}
+                        style={styles.roundButton}>
+                        <Icon name="stop" size={35} color="#eee"/>
+                    </TouchableOpacity>
+                }
+                {!selectedTask &&
                     <TouchableOpacity
                         onPress={_toggleInput}
                         style={styles.roundButton}>
