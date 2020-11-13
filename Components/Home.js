@@ -13,9 +13,12 @@ import SelectATask from "./SelectATask";
 const headerHeight = 175
 const screen = Dimensions.get('window');
 
-const sessionsDuration = 25
-const pausesDuration = 5
-const lastSession = 15
+// const sessionsDuration = 25
+// const pausesDuration = 5
+// const lastSession = 15
+const sessionsDuration = 0.2
+const pausesDuration = 0.1
+const lastSession = 0.3
 const arraySessions = [1,0,1,0,1,0,1,2]
 
 const Home = () => {
@@ -27,6 +30,7 @@ const Home = () => {
     const [currentCount, setCurrentCount] = useState(sessionsDuration * 60)
     const [selectedTask, setSelectedTask] = useState(null)
     const [running, setRunning] = useState(false)
+    const [showCountDown, setShowCountDown] = useState(true)
 
     useEffect(() => {_readStorageData()}, [])
     useEffect(() => {_saveStorageData()}, [tasks])
@@ -34,9 +38,7 @@ const Home = () => {
     const _readStorageData = async () => {
         try {
             const tasks = await AsyncStorage.getItem(STORAGE_KEY)
-            if (tasks !== null) {
-                setTasks(JSON.parse(tasks))
-            }
+            if (tasks !== null) setTasks(JSON.parse(tasks))
         } catch (e) {
             console.error('Failed to fetch the data from storage')
         }
@@ -85,44 +87,47 @@ const Home = () => {
         }
     }
     const _endSession = () => {
-        const select = selectedTask
-        select.session.sessionStep += 1
+        setTimeout(() => {
+            setShowCountDown(false) // ----------
+            const select = selectedTask
+            select.session.sessionStep += 1
 
-        let sessionType = arraySessions[selectedTask.session.sessionStep]
-        if (sessionType === 1) setTime(sessionsDuration * 60)
-        else if (sessionType === 0) setTime(pausesDuration * 60)
-        else setTime(lastSession * 60)
+            let sessionType = arraySessions[selectedTask.session.sessionStep]
+            if (sessionType === 1) select.session.time = sessionsDuration * 60
+            else if (sessionType === 0) select.session.time = pausesDuration * 60
+            else select.session.time = lastSession * 60
 
-        select.session.time = time
-        setSelectedTask(select)
-        // updateTaskSession()
+            setTime(select.session.time)
+            setSelectedTask(select)
+            updateTaskSession()
+            setShowCountDown(true)// ----------
+        }, 100)
     }
     const _toggleSelectedTask = (item) => {
-        // if (selectedTask) updateTaskSession()
+        if (selectedTask) updateTaskSession()
         if (item) {
             setSelectedTask(item)
-            if (selectedTask) {
-                // setCurrentCount(selectedTask.session.time)
-                setTime(selectedTask.session.time)
-                setRunning(false)
-            }
+            setCurrentCount(item.session.time)
+            setTime(item.session.time)
+            setRunning(false)
         } else
             setSelectedTask(null)
     }
     const _onTimerChange = (count) => {
-        setCurrentCount(count)
+        setCurrentCount(count - 1) // -1 for exact timer
     }
     const updateTaskSession = () => {
+        let select = selectedTask
+        select.session.time = currentCount
+        setSelectedTask(select)
+
         let array = [...tasks]
         let index = array.findIndex(item => item.id === selectedTask.id)
-        console.log(index)
         if (index !== -1) {
-            array[index].session.sessionStep = selectedTask.session.sessionStep
-            array[index].session.time = currentCount
+            array[index] = selectedTask
             setTasks(array)
         }
     }
-
     const _toggleInput = () => {
         setIsVisible(!isVisible)
     }
@@ -169,7 +174,9 @@ const Home = () => {
                            running={running}
                            time={time}
                            endSession={_endSession}
-                           onTimerChange={_onTimerChange}/>
+                           onTimerChange={_onTimerChange}
+                           showCountDown={showCountDown}
+                    />
                 :
                     <SelectATask headerHeight={headerHeight}/>
                 }
