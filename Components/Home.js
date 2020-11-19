@@ -167,6 +167,44 @@ const Home = () => {
     const _stopTask = () => {
         setSelectedTask( null)
     }
+    const _resetTask = () => {
+        Alert.alert(
+            "Confirm Reset ?",
+            null,
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                },
+                { text: "OK", onPress: () => {
+                        setTimeout(() => {
+                            setShowCountDown(false) // ----------
+                            let select = selectedTask
+
+                            select.isDone = false
+                            select.session.sessionStep = 0
+                            select.session.time = sessionsDuration * 60
+
+                            setRunning(false)
+                            setTime(select.session.time)
+                            setSelectedTask(select)
+
+                            let array = [...tasks]
+                            let index = array.findIndex(item => item.id === selectedTask.id)
+                            if (index !== -1) {
+                                array[index] = selectedTask
+                                setTasks(array)
+                            }
+
+                            setShowCountDown(true)// ----------
+                        }, 100)
+                    }
+                }
+            ],
+            { cancelable: false }
+        );
+    }
 
     return (
         <View style={styles.container}>
@@ -214,28 +252,42 @@ const Home = () => {
                     <SelectATask headerHeight={headerHeight}/>
                 }
 
-                {(selectedTask && !selectedTask.isDone) &&
+                <View style={styles.containerPlayBtn}>
+                    <TouchableOpacity
+                        onPress={_resetTask}
+                        style={[styles.roundButton, styles.buttonReset, styles.sideButtons]}>
+                        <Icon name={'undo'} size={15} color="#eee"/>
+                    </TouchableOpacity>
+
+                    {(selectedTask && !selectedTask.isDone) &&
+                        <TouchableOpacity
+                            onPress={!running ? _startCountDown : _stopCountDown}
+                            style={[styles.roundButton, styles.buttonPlayPause]}>
+                            <Icon name={!running ? 'play' : 'pause'} size={35} color="#eee"
+                                  style={!running && {right: -3}}/>
+                        </TouchableOpacity>
+                    }
+                    {(selectedTask && selectedTask.isDone) &&
+                        <TouchableOpacity
+                            onPress={_stopTask}
+                            style={[styles.roundButton, styles.buttonPlayPause]}>
+                            <Icon name="stop" size={35} color="#eee"/>
+                        </TouchableOpacity>
+                    }
+                    {!selectedTask &&
+                        <TouchableOpacity
+                            onPress={_toggleInput}
+                            style={[styles.roundButton, styles.buttonPlayPause]}>
+                            <Icon name={isVisible ? 'times' : 'plus'} size={35} color="#eee" />
+                        </TouchableOpacity>
+                    }
+
                     <TouchableOpacity
                         onPress={!running ? _startCountDown : _stopCountDown}
-                        style={styles.roundButton}>
-                        <Icon name={!running ? 'play' : 'pause'} size={35} color="#eee"
-                              style={!running ? {right: -3} : null}/>
+                        style={[styles.roundButton, styles.buttonStop, styles.sideButtons]}>
+                        <Icon name={'stop'} size={15} color="#eee"/>
                     </TouchableOpacity>
-                }
-                {(selectedTask && selectedTask.isDone) &&
-                    <TouchableOpacity
-                        onPress={_stopTask}
-                        style={styles.roundButton}>
-                        <Icon name="stop" size={35} color="#eee"/>
-                    </TouchableOpacity>
-                }
-                {!selectedTask &&
-                    <TouchableOpacity
-                        onPress={_toggleInput}
-                        style={styles.roundButton}>
-                        <Icon name={isVisible ? 'times' : 'plus'} size={35} color="#eee" />
-                    </TouchableOpacity>
-                }
+                </View>
 
             </View>
 
@@ -278,20 +330,51 @@ const styles = StyleSheet.create({
         color: '#f2f2f2',
 
     },
+    containerPlayBtn: {
+        position: 'absolute',
+        bottom: '-18%',
+        alignSelf: 'center',
+        flexDirection: 'row'
+    },
     roundButton: {
-        width: 80,
-        height: 80,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 10,
         borderRadius: 100,
-        backgroundColor: '#33658A',
         alignSelf: 'center',
+    },
+    buttonPlayPause: {
+        width: 80,
+        height: 80,
+        padding: 10,
+        backgroundColor: '#33658A',
         borderWidth: 5,
         borderColor: '#f2f2f2',
-
-        position: 'absolute',
-        bottom: '-18%'
+        marginLeft: 7,
+        marginRight: 7,
     },
+    buttonReset: {
+        width: 30,
+        height: 30,
+        padding: 5,
+        backgroundColor: '#731963',
+    },
+    buttonStop: {
+        width: 30,
+        height: 30,
+        padding: 5,
+        backgroundColor: '#A41324',
+    },
+    sideButtons: {
+        marginTop: 3,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 5,
+        },
+        shadowOpacity: 0.34,
+        shadowRadius: 6.27,
+
+        elevation: 10,
+    }
 })
 export default Home
