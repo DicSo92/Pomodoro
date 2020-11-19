@@ -222,13 +222,12 @@ const Home = () => {
                     />
                 </Svg>
 
-                {selectedTask ?
-                    <View style={styles.absoluteInfos}>
-                        <Text style={styles.task}>Task :</Text>
-                        <Text style={styles.taskName}>{selectedTask.title}</Text>
-                    </View>
-                : null
-                }
+                {/*{selectedTask &&*/}
+                {/*    <View style={styles.absoluteInfos}>*/}
+                {/*        <Text style={styles.task}>Task :</Text>*/}
+                {/*        <Text style={styles.taskName}>{selectedTask.title}</Text>*/}
+                {/*    </View>*/}
+                {/*}*/}
 
 
                 <Sessions arraySessions={arraySessions}
