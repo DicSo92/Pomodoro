@@ -80,8 +80,11 @@ const Home = () => {
         }
     }
     const _toggleDone = (id) => {
+        console.log(selectedTask)
         let array = [...tasks]
         let index = array.findIndex(item => item.id === id)
+        console.log(array[index])
+
         if (index !== -1) {
             array[index].isDone = !array[index].isDone
             setTasks(array);
@@ -253,11 +256,13 @@ const Home = () => {
                 }
 
                 <View style={styles.containerPlayBtn}>
-                    <TouchableOpacity
-                        onPress={_resetTask}
-                        style={[styles.roundButton, styles.buttonReset, styles.sideButtons]}>
-                        <Icon name={'undo'} size={15} color="#eee"/>
-                    </TouchableOpacity>
+                    {selectedTask &&
+                        <TouchableOpacity
+                            onPress={_resetTask}
+                            style={[styles.roundButton, styles.sideButtons, {backgroundColor: '#731963'}]}>
+                            <Icon name={'undo'} size={15} color="#eee"/>
+                        </TouchableOpacity>
+                    }
 
                     {(selectedTask && !selectedTask.isDone) &&
                         <TouchableOpacity
@@ -282,11 +287,13 @@ const Home = () => {
                         </TouchableOpacity>
                     }
 
-                    <TouchableOpacity
-                        onPress={!running ? _startCountDown : _stopCountDown}
-                        style={[styles.roundButton, styles.buttonStop, styles.sideButtons]}>
-                        <Icon name={'stop'} size={15} color="#eee"/>
-                    </TouchableOpacity>
+                    {selectedTask &&
+                        <TouchableOpacity
+                            onPress={selectedTask.isDone || selectedTask.session.sessionStep === null ? null : _endSession}
+                            style={[styles.roundButton, styles.sideButtons, {backgroundColor: selectedTask.isDone || selectedTask.session.sessionStep === null ? 'gray' : '#A41324'}]}>
+                            <Icon name={'fast-forward'} size={15} color="#eee"/>
+                        </TouchableOpacity>
+                    }
                 </View>
 
             </View>
@@ -352,19 +359,10 @@ const styles = StyleSheet.create({
         marginLeft: 7,
         marginRight: 7,
     },
-    buttonReset: {
-        width: 30,
-        height: 30,
-        padding: 5,
-        backgroundColor: '#731963',
-    },
-    buttonStop: {
-        width: 30,
-        height: 30,
-        padding: 5,
-        backgroundColor: '#A41324',
-    },
     sideButtons: {
+        width: 30,
+        height: 30,
+        padding: 5,
         marginTop: 3,
         shadowColor: "#000",
         shadowOffset: {
