@@ -1,5 +1,5 @@
 import React, {createRef, useState} from 'react';
-import {StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {StyleSheet, Text, TextInput, TouchableOpacity, View, Alert} from 'react-native';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
 
@@ -12,7 +12,25 @@ const ListItem = ({item, selectedTask, removeTask, toggleDone, updateTask, toggl
         textInputItem.current.blur()
         updateTask(title)
     }
-
+    const deleteTask = () => {
+        Alert.alert(
+            "Are you sure you want to remove this task ?",
+            title,
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                },
+                { text: "OK", onPress: () => {
+                        console.log("OK Pressed")
+                        removeTask()
+                    }
+                }
+            ],
+            { cancelable: false }
+        );
+    }
 
     return (
         <View style={[styles.container, (selectedTask && selectedTask.id === item.id) && styles.selected]}>
@@ -34,7 +52,7 @@ const ListItem = ({item, selectedTask, removeTask, toggleDone, updateTask, toggl
                 <Icon name="play" size={25} color={item.isDone ? '#D6D6D6' : '#f4511e'} style={{marginRight: 10}}/>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={removeTask}>
+            <TouchableOpacity onPress={deleteTask}>
                 <Icon name="trash" size={25} color="#A41324"/>
             </TouchableOpacity>
         </View>

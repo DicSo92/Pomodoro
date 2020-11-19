@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {View, StyleSheet, Text, Dimensions, TouchableOpacity } from 'react-native';
+import {View, StyleSheet, Text, Dimensions, TouchableOpacity, Alert} from 'react-native';
 import Svg,{ Circle } from 'react-native-svg';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -145,8 +145,24 @@ const Home = () => {
         setRunning(true)
     }
     const _stopCountDown = () => {
-        setRunning(false)
-        updateTaskSession()
+        Alert.alert(
+            "Confirm Pause ?",
+            null,
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                },
+                { text: "OK", onPress: () => {
+                        console.log("OK Pressed")
+                        setRunning(false)
+                        updateTaskSession()
+                    }
+                }
+            ],
+            { cancelable: false }
+        );
     }
     const _stopTask = () => {
         setSelectedTask( null)
