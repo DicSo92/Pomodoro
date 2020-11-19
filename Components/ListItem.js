@@ -3,7 +3,7 @@ import {StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
 
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-const ListItem = ({item, removeTask, toggleDone, updateTask, toggleSelectedTask}) => {
+const ListItem = ({item, selectedTask, removeTask, toggleDone, updateTask, toggleSelectedTask}) => {
     const textInputItem = createRef();
 
     const [title, setTitle] = useState(item.title)
@@ -15,8 +15,8 @@ const ListItem = ({item, removeTask, toggleDone, updateTask, toggleSelectedTask}
 
 
     return (
-        <View style={styles.container}>
-            <TextInput value={title} style={[styles.item, item.isDone ? styles.disabled : '']}
+        <View style={[styles.container, (selectedTask && selectedTask.id === item.id) && styles.selected]}>
+            <TextInput value={title} style={[styles.item, item.isDone && styles.disabled]}
                        ref={textInputItem}
                        placeholder={'Task name...'}
                        onChangeText={value => setTitle(value)}
@@ -49,6 +49,9 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: 'gray',
         padding: 10,
+    },
+    selected: {
+        backgroundColor: 'rgba(244,81,30,0.10)'
     },
 
     item: {

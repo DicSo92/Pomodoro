@@ -225,19 +225,22 @@ const Home = () => {
 
             {isVisible ? <AddTask addTask={_addTask} /> : null}
 
-            <List datas={tasks}
-                  removeTask={_removeTask}
-                  updateTask={_updateTask}
-                  toggleDone={_toggleDone}
-                  toggleSelectedTask={_toggleSelectedTask}
-            />
+            <View style={{flex: 1}}>
+                <List datas={tasks} selectedTask={selectedTask}
+                      removeTask={_removeTask}
+                      updateTask={_updateTask}
+                      toggleDone={_toggleDone}
+                      toggleSelectedTask={_toggleSelectedTask}
+                />
+            </View>
         </View>)
 }
 
 
 const styles = StyleSheet.create({
     container: {
-        flexDirection: 'column'
+        flexDirection: 'column',
+        flex: 1
     },
     timerContainer: {
         position: 'relative',
