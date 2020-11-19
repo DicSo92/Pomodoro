@@ -29,7 +29,8 @@ const ListItem = ({item, removeTask, toggleDone, updateTask, toggleSelectedTask}
                 <Icon name="check" size={25} color={item.isDone ? '#358600' : '#D6D6D6'} style={{marginRight: 10}}/>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={!item.isDone ? toggleSelectedTask : null}>
+            {/*<TouchableOpacity onPress={!item.isDone ? toggleSelectedTask : null}>*/}
+            <TouchableOpacity onPress={toggleSelectedTask}>
                 <Icon name="play" size={25} color={item.isDone ? '#D6D6D6' : '#f4511e'} style={{marginRight: 10}}/>
             </TouchableOpacity>
 
